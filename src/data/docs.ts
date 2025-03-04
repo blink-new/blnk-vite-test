@@ -12,6 +12,9 @@ export interface DocItem {
   category: string;
   slug: string;
   content: string;
+  createdAt: string;
+  updatedAt: string;
+  published?: boolean;
 }
 
 export const categories: DocCategory[] = [
@@ -48,6 +51,9 @@ export const docs: DocItem[] = [
     description: 'Learn about the basics of our platform',
     category: 'getting-started',
     slug: 'introduction',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-15T00:00:00Z',
+    published: true,
     content: `
 # Introduction
 
@@ -76,6 +82,9 @@ To get started, check out the Installation guide.
     description: 'Learn how to install and set up our platform',
     category: 'getting-started',
     slug: 'installation',
+    createdAt: '2023-01-02T00:00:00Z',
+    updatedAt: '2023-01-16T00:00:00Z',
+    published: true,
     content: `
 # Installation
 
@@ -129,6 +138,9 @@ module.exports = {
     description: 'Learn how to authenticate with our API',
     category: 'api',
     slug: 'authentication',
+    createdAt: '2023-01-03T00:00:00Z',
+    updatedAt: '2023-01-17T00:00:00Z',
+    published: true,
     content: `
 # Authentication
 
@@ -177,6 +189,9 @@ fetch('https://api.example.com/data', {
     description: 'Learn how to create your first document',
     category: 'guides',
     slug: 'creating-your-first-document',
+    createdAt: '2023-01-04T00:00:00Z',
+    updatedAt: '2023-01-18T00:00:00Z',
+    published: true,
     content: `
 # Creating Your First Document
 
@@ -253,6 +268,9 @@ Once you're satisfied with your document, click the "Publish" button to make it 
     description: 'Overview of our API',
     category: 'api',
     slug: 'api-overview',
+    createdAt: '2023-01-05T00:00:00Z',
+    updatedAt: '2023-01-19T00:00:00Z',
+    published: true,
     content: `
 # API Overview
 
@@ -309,6 +327,9 @@ The API provides the following endpoints:
     description: 'Example of a blog built with DocsCMS',
     category: 'examples',
     slug: 'example-blog',
+    createdAt: '2023-01-06T00:00:00Z',
+    updatedAt: '2023-01-20T00:00:00Z',
+    published: true,
     content: `
 # Example Project: Blog
 

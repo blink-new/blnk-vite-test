@@ -15,7 +15,12 @@ export function DocPage() {
     if (slug) {
       const currentDoc = getDocBySlug(slug)
       if (currentDoc) {
-        setDoc(currentDoc)
+        // Add createdAt if it doesn't exist
+        const docWithDate = {
+          ...currentDoc,
+          createdAt: currentDoc.createdAt || new Date().toISOString()
+        }
+        setDoc(docWithDate)
         // Get related docs from the same category
         const related = getDocsByCategory(currentDoc.category)
           .filter(d => d.id !== currentDoc.id)
@@ -81,7 +86,7 @@ export function DocPage() {
               
               <h1>{doc.title}</h1>
               
-              <div className="flex items-center text-sm text-text-secondary mb-6">
+              <div className="flex items-center text-sm text-secondary mb-6">
                 <div className="flex items-center mr-4">
                   <Calendar size={14} className="mr-1" />
                   <span>
