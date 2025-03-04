@@ -5,11 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',
     port: 3000,
-    strictPort: true,
+    host: true,
     hmr: {
       clientPort: 443
-    }
+    },
+    allowedHosts: [
+      '3000-ibawutnr6623fyex2ewe6-61cd78f3.blink.new',
+      '.blink.new'
+    ]
   }
 })
