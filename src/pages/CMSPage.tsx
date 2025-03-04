@@ -17,14 +17,31 @@ export function CMSPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto py-8">
-        <div className="flex items-center justify-center h-[60vh]">
+      <div className="container py-8">
+        <div className="flex items-center justify-center h-60vh">
           <div className="text-center animate-fade-in">
             <h1 className="text-2xl font-bold mb-4">Redirecting to CMS Dashboard...</h1>
-            <div className="flex justify-center items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-blue-400 animate-bounce"></div>
-              <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-blue-400 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-blue-400 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            <div className="flex justify-center items-center gap-2">
+              <div className="animate-bounce" style={{ 
+                width: '0.75rem', 
+                height: '0.75rem', 
+                borderRadius: '9999px', 
+                backgroundColor: 'var(--primary)' 
+              }}></div>
+              <div className="animate-bounce" style={{ 
+                width: '0.75rem', 
+                height: '0.75rem', 
+                borderRadius: '9999px', 
+                backgroundColor: 'var(--primary)',
+                animationDelay: '0.2s'
+              }}></div>
+              <div className="animate-bounce" style={{ 
+                width: '0.75rem', 
+                height: '0.75rem', 
+                borderRadius: '9999px', 
+                backgroundColor: 'var(--primary)',
+                animationDelay: '0.4s'
+              }}></div>
             </div>
           </div>
         </div>

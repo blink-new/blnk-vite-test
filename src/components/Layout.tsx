@@ -1,6 +1,5 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Moon, Sun } from 'lucide-react'
 
 interface LayoutProps {
   children: ReactNode
@@ -9,12 +8,33 @@ interface LayoutProps {
 
 export function Layout({ children, className = '' }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(true)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check if user has a preference stored
+    const savedTheme = localStorage.getItem('theme')
+    // Check if user prefers dark mode
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    return savedTheme === 'dark' || (!savedTheme && prefersDark)
+  })
   const location = useLocation()
+
+  // Apply dark mode on initial load
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [])
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode)
-    document.documentElement.classList.toggle('dark')
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    } else {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    }
   }
 
   const isActive = (path: string) => {
@@ -22,9 +42,9 @@ export function Layout({ children, className = '' }: LayoutProps) {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark' : ''}`}>
-      <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-950 shadow-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <div className={`min-h-screen flex flex-col`}>
+      <header className="header">
+        <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +54,8 @@ export function Layout({ children, className = '' }: LayoutProps) {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-6 w-6 text-blue-600 dark:text-blue-400"
+              className="h-5 w-5"
+              style={{ color: 'var(--primary)' }}
             >
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
               <path d="M2 17l10 5 10-5" />
@@ -46,25 +67,25 @@ export function Layout({ children, className = '' }: LayoutProps) {
           <nav className="hidden md:flex items-center gap-6">
             <Link 
               to="/docs" 
-              className={`text-sm font-medium ${isActive('/docs') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+              className={`text-sm font-medium ${isActive('/docs') ? 'text-blue-600' : 'text-gray-600'}`}
             >
               Documentation
             </Link>
             <Link 
               to="/guides" 
-              className={`text-sm font-medium ${isActive('/guides') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+              className={`text-sm font-medium ${isActive('/guides') ? 'text-blue-600' : 'text-gray-600'}`}
             >
               Guides
             </Link>
             <Link 
               to="/api" 
-              className={`text-sm font-medium ${isActive('/api') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+              className={`text-sm font-medium ${isActive('/api') ? 'text-blue-600' : 'text-gray-600'}`}
             >
               API
             </Link>
             <Link 
               to="/examples" 
-              className={`text-sm font-medium ${isActive('/examples') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+              className={`text-sm font-medium ${isActive('/examples') ? 'text-blue-600' : 'text-gray-600'}`}
             >
               Examples
             </Link>
@@ -73,57 +94,83 @@ export function Layout({ children, className = '' }: LayoutProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 rounded-md"
+              style={{ color: 'var(--secondary)' }}
+              aria-label="Toggle dark mode"
             >
               {isDarkMode ? (
-                <Sun className="h-5 w-5" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
               ) : (
-                <Moon className="h-5 w-5" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
               )}
             </button>
             <Link 
               to="/login" 
-              className="inline-flex items-center justify-center rounded-md bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 dark:hover:bg-blue-600"
+              className="btn btn-primary"
             >
               Sign In
             </Link>
             <button
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden"
+              className="p-2 rounded-md md:hidden"
+              style={{ color: 'var(--secondary)' }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              <span className="sr-only">Toggle menu</span>
+              {mobileMenuOpen ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
         
         {mobileMenuOpen && (
-          <div className="container mx-auto py-4 px-4 md:hidden">
+          <div className="container py-4 md:hidden border-t">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/docs" 
-                className={`text-sm font-medium ${isActive('/docs') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`text-sm font-medium ${isActive('/docs') ? 'text-blue-600' : 'text-gray-600'}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Documentation
               </Link>
               <Link 
                 to="/guides" 
-                className={`text-sm font-medium ${isActive('/guides') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`text-sm font-medium ${isActive('/guides') ? 'text-blue-600' : 'text-gray-600'}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Guides
               </Link>
               <Link 
                 to="/api" 
-                className={`text-sm font-medium ${isActive('/api') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`text-sm font-medium ${isActive('/api') ? 'text-blue-600' : 'text-gray-600'}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 API
               </Link>
               <Link 
                 to="/examples" 
-                className={`text-sm font-medium ${isActive('/examples') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`text-sm font-medium ${isActive('/examples') ? 'text-blue-600' : 'text-gray-600'}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Examples
@@ -133,13 +180,13 @@ export function Layout({ children, className = '' }: LayoutProps) {
         )}
       </header>
 
-      <main className={`flex-1 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 ${className}`}>
+      <main className={`flex-1 ${className}`}>
         {children}
       </main>
 
-      <footer className="border-t bg-white dark:bg-gray-950">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-4 py-10 px-4 md:h-24 md:flex-row md:py-0">
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400 md:text-left">
+      <footer className="footer">
+        <div className="container flex flex-col items-center justify-between gap-4 py-10 md:flex-row md:h-24 md:py-0">
+          <p className="text-center text-sm text-gray-500 md:text-left">
             Built with ❤️ by DocsCMS. The source code is available on GitHub.
           </p>
           <div className="flex items-center gap-4">
@@ -147,7 +194,7 @@ export function Layout({ children, className = '' }: LayoutProps) {
               href="https://github.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+              className="text-sm text-gray-500 transition-colors"
             >
               GitHub
             </a>
@@ -155,7 +202,7 @@ export function Layout({ children, className = '' }: LayoutProps) {
               href="https://twitter.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+              className="text-sm text-gray-500 transition-colors"
             >
               Twitter
             </a>
@@ -163,7 +210,7 @@ export function Layout({ children, className = '' }: LayoutProps) {
               href="https://discord.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+              className="text-sm text-gray-500 transition-colors"
             >
               Discord
             </a>
