@@ -1,29 +1,24 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ThemeToggle } from './ThemeToggle'
-import { cn } from '../lib/utils'
-import { Menu, X, Github, Search } from 'lucide-react'
-import { useState } from 'react'
 
 interface LayoutProps {
   children: ReactNode
-  className?: string
 }
 
-export function Layout({ children, className }: LayoutProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+export function Layout({ children }: LayoutProps) {
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode)
+    document.documentElement.classList.toggle('dark')
+  }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              className="lg:hidden p-2"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+    <div className={`app ${isDarkMode ? 'dark' : ''}`}>
+      <header className="header">
+        <div className="container">
+          <div className="header-logo">
             <Link to="/" className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -33,170 +28,134 @@ export function Layout({ children, className }: LayoutProps) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-6 w-6"
               >
                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
                 <path d="M2 17l10 5 10-5" />
                 <path d="M2 12l10 5 10-5" />
               </svg>
-              <span className="font-bold text-xl">DocsCMS</span>
+              <h1>DocsCMS</h1>
             </Link>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-6">
-            <Link
-              to="/docs"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Documentation
-            </Link>
-            <Link
-              to="/guides"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Guides
-            </Link>
-            <Link
-              to="/api"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              API
-            </Link>
-            <Link
-              to="/examples"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Examples
-            </Link>
+          <button
+            className="mobile-menu-button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+          </button>
+
+          <nav>
+            <ul>
+              <li><Link to="/docs">Documentation</Link></li>
+              <li><Link to="/guides">Guides</Link></li>
+              <li><Link to="/api">API</Link></li>
+              <li><Link to="/examples">Examples</Link></li>
+            </ul>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <input
-                type="search"
-                placeholder="Search documentation..."
-                className="pl-8 h-9 w-[200px] lg:w-[300px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              />
-            </div>
-            <ThemeToggle />
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 rounded-md hover:bg-secondary transition-colors"
+          <div className="header-actions">
+            <button
+              className="theme-toggle"
+              onClick={toggleDarkMode}
+              aria-label="Toggle theme"
             >
-              <Github className="h-5 w-5" />
-            </a>
-            <Link
-              to="/login"
-              className="hidden md:inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-            >
-              Sign In
-            </Link>
+              {isDarkMode ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            <Link to="/login" className="sign-in-button">Sign In</Link>
           </div>
         </div>
       </header>
 
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-40 lg:hidden">
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <nav className="fixed top-0 left-0 bottom-0 w-3/4 max-w-xs p-6 bg-background border-r overflow-y-auto">
-            <div className="space-y-4">
-              <Link
-                to="/docs"
-                className="block py-2 text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Documentation
-              </Link>
-              <Link
-                to="/guides"
-                className="block py-2 text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Guides
-              </Link>
-              <Link
-                to="/api"
-                className="block py-2 text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                API
-              </Link>
-              <Link
-                to="/examples"
-                className="block py-2 text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Examples
-              </Link>
-              <div className="pt-4 border-t">
-                <Link
-                  to="/login"
-                  className="w-full flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-              </div>
-            </div>
-          </nav>
+      {isMobileMenuOpen && (
+        <div className="mobile-menu">
+          <ul>
+            <li><Link to="/docs" onClick={() => setIsMobileMenuOpen(false)}>Documentation</Link></li>
+            <li><Link to="/guides" onClick={() => setIsMobileMenuOpen(false)}>Guides</Link></li>
+            <li><Link to="/api" onClick={() => setIsMobileMenuOpen(false)}>API</Link></li>
+            <li><Link to="/examples" onClick={() => setIsMobileMenuOpen(false)}>Examples</Link></li>
+          </ul>
         </div>
       )}
 
-      <main className={cn("flex-1", className)}>
+      <main>
         {children}
       </main>
 
-      <footer className="border-t py-6 md:py-10">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            Built with ❤️ by{" "}
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              DocsCMS
-            </a>
-            . The source code is available on{" "}
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              GitHub
-            </a>
-            .
-          </p>
-          <div className="flex items-center gap-4">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium underline underline-offset-4"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium underline underline-offset-4"
-            >
-              Twitter
-            </a>
-            <a
-              href="https://discord.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium underline underline-offset-4"
-            >
-              Discord
-            </a>
+      <footer>
+        <div className="container">
+          <p>Built with ❤️ by DocsCMS. The source code is available on GitHub.</p>
+          <div className="footer-links">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
+            <a href="https://discord.com" target="_blank" rel="noopener noreferrer">Discord</a>
           </div>
         </div>
       </footer>

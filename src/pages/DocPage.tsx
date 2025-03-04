@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
-import { getDocBySlug, getDocsByCategory } from '../lib/data'
-import { ChevronRight, ChevronLeft, Clock, Calendar, Tag, User } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import { DocItem } from '../types'
-import { format } from 'date-fns'
+import { getDocBySlug, getDocsByCategory } from '../data/docs'
+import { DocItem } from '../data/docs'
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -47,110 +44,71 @@ export function DocPage() {
   return (
     <Layout>
       <div className="container py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          <main className="flex-1 min-w-0">
-            <div className="mb-6">
-              <div className="flex items-center text-sm text-muted-foreground mb-2">
-                <Link to="/" className="hover:text-foreground">Home</Link>
-                <ChevronRight className="h-4 w-4 mx-1" />
-                <Link to="/docs" className="hover:text-foreground">Docs</Link>
-                <ChevronRight className="h-4 w-4 mx-1" />
-                <Link to={`/docs/category/${doc.category}`} className="hover:text-foreground">
-                  {doc.category.charAt(0).toUpperCase() + doc.category.slice(1).replace('-', ' ')}
-                </Link>
-                <ChevronRight className="h-4 w-4 mx-1" />
-                <span className="text-foreground">{doc.title}</span>
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {doc.title}
-              </h1>
-              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <time dateTime={doc.createdAt}>
-                    {format(new Date(doc.createdAt), 'MMMM d, yyyy')}
-                  </time>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <time dateTime={doc.updatedAt}>
-                    Updated {format(new Date(doc.updatedAt), 'MMMM d, yyyy')}
-                  </time>
-                </div>
-                {doc.author && (
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
-                    <span>{doc.author}</span>
-                  </div>
-                )}
-                {doc.tags && doc.tags.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Tag className="h-4 w-4" />
-                    <div className="flex flex-wrap gap-1">
-                      {doc.tags.map((tag) => (
-                        <span key={tag} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-              <ReactMarkdown>
-                {doc.content}
-              </ReactMarkdown>
-            </div>
-
-            <div className="mt-12 flex items-center justify-between border-t pt-6">
-              <Link
-                to="/docs"
-                className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Back to docs
-              </Link>
-              {doc.version && (
-                <div className="text-sm text-muted-foreground">
-                  Version: {doc.version}
-                </div>
-              )}
-            </div>
-          </main>
-          <aside className="w-full md:w-64 shrink-0">
-            <div className="sticky top-20">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-medium mb-3">On This Page</h3>
-                <nav className="space-y-1 text-sm">
-                  {/* This would ideally be generated from the markdown headings */}
-                  <a href="#introduction" className="block py-1 hover:text-primary">Introduction</a>
-                  <a href="#features" className="block py-1 hover:text-primary">Features</a>
-                  <a href="#getting-started" className="block py-1 hover:text-primary">Getting Started</a>
-                </nav>
-              </div>
-              
-              {relatedDocs.length > 0 && (
-                <div className="mt-6 rounded-lg border p-4">
-                  <h3 className="font-medium mb-3">Related Documents</h3>
-                  <div className="space-y-3">
-                    {relatedDocs.map((relatedDoc) => (
-                      <Link
-                        key={relatedDoc.id}
-                        to={`/docs/${relatedDoc.slug}`}
-                        className="block text-sm hover:text-primary"
-                      >
+        <div className="docs-container">
+          <div className="docs-sidebar">
+            <h3>On This Page</h3>
+            <ul>
+              <li><a href="#introduction">Introduction</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#getting-started">Getting Started</a></li>
+            </ul>
+            
+            {relatedDocs.length > 0 && (
+              <>
+                <h3 className="mt-6">Related Documents</h3>
+                <ul>
+                  {relatedDocs.map(relatedDoc => (
+                    <li key={relatedDoc.id}>
+                      <Link to={`/docs/${relatedDoc.slug}`}>
                         {relatedDoc.title}
                       </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+          
+          <div className="docs-content">
+            <div className="mb-4">
+              <Link to="/docs" className="text-sm text-primary hover:underline">
+                ← Back to Documentation
+              </Link>
             </div>
-          </aside>
+            
+            <div dangerouslySetInnerHTML={{ __html: markdownToHtml(doc.content) }} />
+          </div>
         </div>
       </div>
     </Layout>
   )
+}
+
+// Simple markdown to HTML converter
+function markdownToHtml(markdown: string): string {
+  // This is a very basic implementation
+  // In a real app, you would use a proper markdown parser
+  let html = markdown
+    // Headers
+    .replace(/^# (.*$)/gm, '<h1 id="$1">$1</h1>')
+    .replace(/^## (.*$)/gm, '<h2 id="$1">$1</h2>')
+    .replace(/^### (.*$)/gm, '<h3 id="$1">$1</h3>')
+    // Bold
+    .replace(/\*\*(.*)\*\*/gm, '<strong>$1</strong>')
+    // Italic
+    .replace(/\*(.*)\*/gm, '<em>$1</em>')
+    // Code blocks
+    .replace(/```([\s\S]*?)```/gm, '<pre><code>$1</code></pre>')
+    // Inline code
+    .replace(/`([^`]+)`/gm, '<code>$1</code>')
+    // Lists
+    .replace(/^\- (.*$)/gm, '<ul><li>$1</li></ul>')
+    // Fix lists (this is a hack)
+    .replace(/<\/ul>\n<ul>/gm, '')
+    // Paragraphs
+    .replace(/^(?!<[a-z])(.*$)/gm, '<p>$1</p>')
+    // Fix empty paragraphs
+    .replace(/<p><\/p>/gm, '')
+
+  return html
 }
