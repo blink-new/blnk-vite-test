@@ -65,43 +65,16 @@ const TexturedMaterial = ({
   emissiveIntensity?: number;
   isBasicMaterial?: boolean;
 }) => {
-  try {
-    // Fix texture path by ensuring it starts with a slash
-    const fixedTextureUrl = textureUrl.startsWith('/') ? textureUrl : `/${textureUrl}`;
-    // Load texture safely
-    const texture = useTexture(fixedTextureUrl);
-    
-    if (isBasicMaterial) {
-      return (
-        <meshBasicMaterial 
-          color={color} 
-          map={texture} 
-          emissive={emissive} 
-          emissiveIntensity={emissiveIntensity || 0}
-        />
-      );
-    } else {
-      return (
-        <meshStandardMaterial 
-          color={color} 
-          map={texture} 
-          emissive={emissive} 
-          emissiveIntensity={emissiveIntensity || 0}
-        />
-      );
-    }
-  } catch (error) {
-    console.error(`Error loading texture: ${textureUrl}`, error);
-    // Fallback to non-textured material
-    return (
-      <SafeTextureMaterial 
-        color={color}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-        isBasicMaterial={isBasicMaterial}
-      />
-    );
-  }
+  // Since we're using placeholder files, let's just use the color material
+  // In a real app, you would use the texture
+  return (
+    <SafeTextureMaterial 
+      color={color}
+      emissive={emissive}
+      emissiveIntensity={emissiveIntensity}
+      isBasicMaterial={isBasicMaterial}
+    />
+  );
 };
 
 // Material with error handling
@@ -118,34 +91,14 @@ const MaterialWithFallback = ({
   emissiveIntensity?: number;
   isBasicMaterial?: boolean;
 }) => {
-  if (!textureUrl) {
-    return (
-      <SafeTextureMaterial 
-        color={color}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-        isBasicMaterial={isBasicMaterial}
-      />
-    );
-  }
-  
+  // Always use the safe material for now since we have placeholder textures
   return (
-    <Suspense fallback={
-      <SafeTextureMaterial 
-        color={color}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-        isBasicMaterial={isBasicMaterial}
-      />
-    }>
-      <TexturedMaterial 
-        textureUrl={textureUrl}
-        color={color}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-        isBasicMaterial={isBasicMaterial}
-      />
-    </Suspense>
+    <SafeTextureMaterial 
+      color={color}
+      emissive={emissive}
+      emissiveIntensity={emissiveIntensity}
+      isBasicMaterial={isBasicMaterial}
+    />
   );
 };
 
