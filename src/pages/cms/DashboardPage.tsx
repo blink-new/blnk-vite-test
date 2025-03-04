@@ -2,13 +2,49 @@ import { useState } from 'react'
 import { Layout } from '../../components/Layout'
 import { getAllDocs, getCategories } from '../../lib/data'
 import { Link } from 'react-router-dom'
-import { Edit, Trash, Plus, FileText, Users, Settings, BarChart } from 'lucide-react'
+import { 
+  Edit, 
+  Trash, 
+  Plus, 
+  FileText, 
+  Users, 
+  Settings, 
+  BarChart,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  User
+} from 'lucide-react'
 import { format } from 'date-fns'
 
 export function DashboardPage() {
   const [activeTab, setActiveTab] = useState('documents')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  
   const docs = getAllDocs()
   const categories = getCategories()
+  
+  // Filter documents based on search query and filters
+  const filteredDocs = docs.filter(doc => {
+    const matchesSearch = searchQuery === '' || 
+      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.description.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    const matchesCategory = categoryFilter === '' || doc.category === categoryFilter
+    const matchesStatus = statusFilter === '' || 
+      (statusFilter === 'published' && doc.published) ||
+      (statusFilter === 'draft' && !doc.published)
+    
+    return matchesSearch && matchesCategory && matchesStatus
+  })
+
+  const handleDeleteDoc = (id: string) => {
+    // In a real app, we would delete the document
+    console.log('Deleting document:', id)
+    alert('Delete functionality would be implemented in a real app')
+  }
 
   return (
     <Layout className="bg-muted/30">
@@ -66,7 +102,11 @@ export function DashboardPage() {
                   <div className="p-4 sm:p-6">
                     <div className="flex items-center gap-4 flex-wrap">
                       <div className="relative">
-                        <select className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                        <select 
+                          className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                        >
                           <option value="">All Categories</option>
                           {categories.map((category) => (
                             <option key={category.id} value={category.id}>
@@ -76,17 +116,24 @@ export function DashboardPage() {
                         </select>
                       </div>
                       <div className="relative">
-                        <select className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                        <select 
+                          className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          value={statusFilter}
+                          onChange={(e) => setStatusFilter(e.target.value)}
+                        >
                           <option value="">All Status</option>
                           <option value="published">Published</option>
                           <option value="draft">Draft</option>
                         </select>
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
                           type="search"
                           placeholder="Search documents..."
-                          className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="w-full h-9 rounded-md border border-input bg-background pl-9 pr-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
                         />
                       </div>
                     </div>
@@ -114,69 +161,79 @@ export function DashboardPage() {
                           </tr>
                         </thead>
                         <tbody className="[&_tr:last-child]:border-0">
-                          {docs.map((doc) => (
-                            <tr
-                              key={doc.id}
-                              className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                            >
-                              <td className="p-4 align-middle">
-                                <div className="font-medium">{doc.title}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  {doc.description.length > 50
-                                    ? `${doc.description.substring(0, 50)}...`
-                                    : doc.description}
-                                </div>
-                              </td>
-                              <td className="p-4 align-middle">
-                                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                  {doc.category}
-                                </div>
-                              </td>
-                              <td className="p-4 align-middle">
-                                <div className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                                  doc.published
-                                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                                }`}>
-                                  {doc.published ? 'Published' : 'Draft'}
-                                </div>
-                              </td>
-                              <td className="p-4 align-middle">
-                                {format(new Date(doc.updatedAt), 'MMM d, yyyy')}
-                              </td>
-                              <td className="p-4 align-middle text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <Link
-                                    to={`/cms/documents/edit/${doc.id}`}
-                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                    <span className="sr-only">Edit</span>
-                                  </Link>
-                                  <button
-                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                    <span className="sr-only">Delete</span>
-                                  </button>
-                                </div>
+                          {filteredDocs.length > 0 ? (
+                            filteredDocs.map((doc) => (
+                              <tr
+                                key={doc.id}
+                                className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                              >
+                                <td className="p-4 align-middle">
+                                  <div className="font-medium">{doc.title}</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {doc.description.length > 50
+                                      ? `${doc.description.substring(0, 50)}...`
+                                      : doc.description}
+                                  </div>
+                                </td>
+                                <td className="p-4 align-middle">
+                                  <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    {doc.category}
+                                  </div>
+                                </td>
+                                <td className="p-4 align-middle">
+                                  <div className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                    doc.published
+                                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                                  }`}>
+                                    {doc.published ? 'Published' : 'Draft'}
+                                  </div>
+                                </td>
+                                <td className="p-4 align-middle">
+                                  {format(new Date(doc.updatedAt), 'MMM d, yyyy')}
+                                </td>
+                                <td className="p-4 align-middle text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Link
+                                      to={`/cms/documents/edit/${doc.slug}`}
+                                      className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                      <span className="sr-only">Edit</span>
+                                    </Link>
+                                    <button
+                                      onClick={() => handleDeleteDoc(doc.id)}
+                                      className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
+                                    >
+                                      <Trash className="h-4 w-4" />
+                                      <span className="sr-only">Delete</span>
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                                No documents found. Try adjusting your filters or create a new document.
                               </td>
                             </tr>
-                          ))}
+                          )}
                         </tbody>
                       </table>
                     </div>
                   </div>
                   <div className="flex items-center justify-between px-4 py-4 border-t">
                     <div className="text-sm text-muted-foreground">
-                      Showing <strong>1</strong> to <strong>{docs.length}</strong> of{" "}
-                      <strong>{docs.length}</strong> results
+                      Showing <strong>1</strong> to <strong>{filteredDocs.length}</strong> of{" "}
+                      <strong>{filteredDocs.length}</strong> results
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
                         disabled
                       >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
                         Previous
                       </button>
                       <button
@@ -184,6 +241,7 @@ export function DashboardPage() {
                         disabled
                       >
                         Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
                       </button>
                     </div>
                   </div>
@@ -214,11 +272,12 @@ export function DashboardPage() {
                           <option value="viewer">Viewer</option>
                         </select>
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
                           type="search"
                           placeholder="Search users..."
-                          className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="w-full h-9 rounded-md border border-input bg-background pl-9 pr-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                         />
                       </div>
                     </div>
@@ -373,7 +432,11 @@ export function DashboardPage() {
                 <div className="rounded-lg border bg-background p-6">
                   <h3 className="text-lg font-medium mb-4">Page Views Over Time</h3>
                   <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                    Chart will be displayed here
+                    <div className="text-center">
+                      <BarChart className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
+                      <p>Analytics data will be displayed here</p>
+                      <p className="text-sm text-muted-foreground mt-1">Connect to an analytics provider to see real data</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -502,23 +565,5 @@ export function DashboardPage() {
         </div>
       </div>
     </Layout>
-  )
-}
-
-function User({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
   )
 }

@@ -2,7 +2,22 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Layout } from '../../components/Layout'
 import { getCategories, getDocBySlug } from '../../lib/data'
-import { ChevronLeft, Save, Eye, Trash, Clock } from 'lucide-react'
+import { 
+  ChevronLeft, 
+  Save, 
+  Eye, 
+  Trash, 
+  Clock, 
+  Bold, 
+  Italic, 
+  Link as LinkIcon, 
+  Code, 
+  Heading1, 
+  Heading2, 
+  List, 
+  ListOrdered, 
+  Image
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function DocumentEditorPage() {
@@ -21,6 +36,7 @@ export function DocumentEditorPage() {
   })
   
   const [previewMode, setPreviewMode] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   
   useEffect(() => {
     if (!isNewDoc && id) {
@@ -36,9 +52,12 @@ export function DocumentEditorPage() {
           published: doc.published,
           tags: doc.tags?.join(', ') || '',
         })
+      } else {
+        // If document not found, redirect to dashboard
+        navigate('/cms/dashboard')
       }
     }
-  }, [id, isNewDoc])
+  }, [id, isNewDoc, navigate])
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -52,19 +71,56 @@ export function DocumentEditorPage() {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, we would save the document to the database
-    console.log('Saving document:', formData)
-    navigate('/cms')
+    setIsSaving(true)
+    
+    // Simulate saving delay
+    setTimeout(() => {
+      // In a real app, we would save the document to the database
+      console.log('Saving document:', formData)
+      setIsSaving(false)
+      navigate('/cms/dashboard')
+    }, 1000)
+  }
+  
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this document?')) {
+      // In a real app, we would delete the document
+      console.log('Deleting document:', id)
+      navigate('/cms/dashboard')
+    }
+  }
+  
+  const insertMarkdown = (prefix: string, suffix: string = '') => {
+    const textarea = document.getElementById('content') as HTMLTextAreaElement
+    if (!textarea) return
+    
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = textarea.value.substring(start, end)
+    const beforeText = textarea.value.substring(0, start)
+    const afterText = textarea.value.substring(end)
+    
+    const newText = beforeText + prefix + selectedText + suffix + afterText
+    setFormData(prev => ({ ...prev, content: newText }))
+    
+    // Set cursor position after insertion
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(
+        start + prefix.length,
+        end + prefix.length
+      )
+    }, 0)
   }
 
   return (
     <Layout className="bg-muted/30">
       <div className="container py-8">
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link
-                to="/cms"
+                to="/cms/dashboard"
                 className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -86,7 +142,8 @@ export function DocumentEditorPage() {
               {!isNewDoc && (
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground"
+                  onClick={handleDelete}
+                  className="inline-flex items-center gap-1 rounded-md border border-destructive bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive shadow-sm hover:bg-destructive/20"
                 >
                   <Trash className="h-4 w-4" />
                   Delete
@@ -95,10 +152,20 @@ export function DocumentEditorPage() {
               <button
                 type="submit"
                 form="document-form"
-                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none"
+                disabled={isSaving}
               >
-                <Save className="h-4 w-4" />
-                Save
+                {isSaving ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -115,7 +182,7 @@ export function DocumentEditorPage() {
             <div className="prose prose-slate dark:prose-invert max-w-none">
               <h1>{formData.title || 'Untitled Document'}</h1>
               <p className="lead">{formData.description}</p>
-              <div dangerouslySetInnerHTML={{ __html: formData.content }} />
+              <div dangerouslySetInnerHTML={{ __html: formData.content.replace(/\n/g, '<br />') }} />
             </div>
           </div>
         ) : (
@@ -135,6 +202,7 @@ export function DocumentEditorPage() {
                       className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                       value={formData.title}
                       onChange={handleChange}
+                      placeholder="Enter document title"
                     />
                   </div>
                   <div>
@@ -149,6 +217,7 @@ export function DocumentEditorPage() {
                       className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                       value={formData.description}
                       onChange={handleChange}
+                      placeholder="Brief description of the document"
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -200,6 +269,9 @@ export function DocumentEditorPage() {
                         Published
                       </label>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Published documents are visible to all users
+                    </p>
                   </div>
                 </div>
               </div>
@@ -210,127 +282,89 @@ export function DocumentEditorPage() {
                     Content (Markdown)
                   </label>
                   <div className="border rounded-md">
-                    <div className="flex items-center gap-2 p-2 border-b">
+                    <div className="flex flex-wrap items-center gap-1 p-2 border-b">
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
                         title="Bold"
+                        onClick={() => insertMarkdown('**', '**')}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <path d="M14 12a4 4 0 0 0 0-8H6v8" />
-                          <path d="M15 20a4 4 0 0 0 0-8H6v8Z" />
-                        </svg>
+                        <Bold className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
                         title="Italic"
+                        onClick={() => insertMarkdown('*', '*')}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <line x1="19" x2="10" y1="4" y2="4" />
-                          <line x1="14" x2="5" y1="20" y2="20" />
-                          <line x1="15" x2="9" y1="4" y2="20" />
-                        </svg>
+                        <Italic className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
                         title="Link"
+                        onClick={() => insertMarkdown('[', '](url)')}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                        </svg>
+                        <LinkIcon className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
                         title="Code"
+                        onClick={() => insertMarkdown('`', '`')}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <polyline points="16 18 22 12 16 6" />
-                          <polyline points="8 6 2 12 8 18" />
-                        </svg>
+                        <Code className="h-4 w-4" />
                       </button>
-                      <div className="h-4 w-px bg-border mx-2" />
+                      <div className="h-4 w-px bg-border mx-1" />
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
                         title="Heading 1"
+                        onClick={() => insertMarkdown('# ')}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <path d="M4 12h8" />
-                          <path d="M4 18V6" />
-                          <path d="M12 18V6" />
-                          <path d="M17 12a5 5 0 0 0 5-5" />
-                          <path d="M17 12a5 5 0 0 1 5 5" />
-                        </svg>
+                        <Heading1 className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
                         title="Heading 2"
+                        onClick={() => insertMarkdown('## ')}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <path d="M4 12h8" />
-                          <path d="M4 18V6" />
-                          <path d="M12 18V6" />
-                          <path d="M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1" />
-                        </svg>
+                        <Heading2 className="h-4 w-4" />
+                      </button>
+                      <div className="h-4 w-px bg-border mx-1" />
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                        title="Bulleted List"
+                        onClick={() => insertMarkdown('- ')}
+                      >
+                        <List className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                        title="Numbered List"
+                        onClick={() => insertMarkdown('1. ')}
+                      >
+                        <ListOrdered className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                        title="Image"
+                        onClick={() => insertMarkdown('![alt text](', ')')}
+                      >
+                        <Image className="h-4 w-4" />
+                      </button>
+                      <div className="h-4 w-px bg-border mx-1" />
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 px-2"
+                        title="Code Block"
+                        onClick={() => insertMarkdown('```\n', '\n```')}
+                      >
+                        Code Block
                       </button>
                     </div>
                     <textarea
@@ -340,6 +374,7 @@ export function DocumentEditorPage() {
                       className="w-full rounded-b-md border-0 bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-0"
                       value={formData.content}
                       onChange={handleChange}
+                      placeholder="Write your content in Markdown format..."
                     />
                   </div>
                   <p className="mt-2 text-xs text-muted-foreground">

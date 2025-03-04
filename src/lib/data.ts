@@ -58,6 +58,9 @@ To get started, check out the [Installation](/docs/installation) guide.
     createdAt: '2023-01-01T00:00:00.000Z',
     updatedAt: '2023-01-01T00:00:00.000Z',
     published: true,
+    tags: ['introduction', 'overview'],
+    author: 'Admin',
+    version: '1.0.0',
   },
   {
     id: '2',
@@ -114,6 +117,9 @@ module.exports = {
     createdAt: '2023-01-02T00:00:00.000Z',
     updatedAt: '2023-01-02T00:00:00.000Z',
     published: true,
+    tags: ['installation', 'setup'],
+    author: 'Admin',
+    version: '1.0.0',
   },
   {
     id: '3',
@@ -165,6 +171,9 @@ fetch('https://api.example.com/data', {
     createdAt: '2023-01-03T00:00:00.000Z',
     updatedAt: '2023-01-03T00:00:00.000Z',
     published: true,
+    tags: ['api', 'authentication'],
+    author: 'Admin',
+    version: '1.0.0',
   },
   {
     id: '4',
@@ -244,6 +253,71 @@ Once you're satisfied with your document, click the "Publish" button to make it 
     createdAt: '2023-01-04T00:00:00.000Z',
     updatedAt: '2023-01-04T00:00:00.000Z',
     published: true,
+    tags: ['guides', 'documents'],
+    author: 'Admin',
+    version: '1.0.0',
+  },
+  {
+    id: '5',
+    title: 'API Overview',
+    description: 'Overview of our API',
+    category: 'api',
+    slug: 'api-overview',
+    content: `
+# API Overview
+
+Our API allows you to programmatically access and manipulate your documentation.
+
+## Base URL
+
+All API requests should be made to the following base URL:
+
+\`\`\`
+https://api.docscms.com/v1
+\`\`\`
+
+## Authentication
+
+All API requests require authentication. See the [Authentication](/docs/authentication) guide for details.
+
+## Rate Limiting
+
+The API is rate limited to 100 requests per minute per API key. If you exceed this limit, you'll receive a 429 Too Many Requests response.
+
+## Endpoints
+
+The API provides the following endpoints:
+
+### Documents
+
+- \`GET /documents\` - List all documents
+- \`GET /documents/{id}\` - Get a specific document
+- \`POST /documents\` - Create a new document
+- \`PUT /documents/{id}\` - Update a document
+- \`DELETE /documents/{id}\` - Delete a document
+
+### Categories
+
+- \`GET /categories\` - List all categories
+- \`GET /categories/{id}\` - Get a specific category
+- \`POST /categories\` - Create a new category
+- \`PUT /categories/{id}\` - Update a category
+- \`DELETE /categories/{id}\` - Delete a category
+
+### Users
+
+- \`GET /users\` - List all users
+- \`GET /users/{id}\` - Get a specific user
+- \`POST /users\` - Create a new user
+- \`PUT /users/{id}\` - Update a user
+- \`DELETE /users/{id}\` - Delete a user
+    `,
+    createdAt: '2023-01-05T00:00:00.000Z',
+    updatedAt: '2023-01-05T00:00:00.000Z',
+    published: true,
+    tags: ['api', 'overview'],
+    author: 'Admin',
+    version: '1.0.0',
   },
 ]
 
@@ -256,11 +330,11 @@ export function getDocsByCategory(categoryId: string): DocItem[] {
 }
 
 export function getDocBySlug(slug: string): DocItem | undefined {
-  return docs.find(doc => doc.slug === slug && doc.published)
+  return docs.find(doc => doc.slug === slug)
 }
 
 export function getAllDocs(): DocItem[] {
-  return docs.filter(doc => doc.published)
+  return docs
 }
 
 export function searchDocs(query: string): DocItem[] {
