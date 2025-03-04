@@ -96,6 +96,26 @@ html, body {
   height: 60vh;
 }
 
+.h-64 {
+  height: 16rem;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.w-72 {
+  width: 18rem;
+}
+
+.w-80 {
+  width: 20rem;
+}
+
+.w-96 {
+  width: 24rem;
+}
+
 .flex-1 {
   flex: 1;
 }
@@ -171,12 +191,40 @@ html, body {
   margin-bottom: 0.25rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
 .mb-4 {
   margin-bottom: 1rem;
 }
 
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mr-1 {
+  margin-right: 0.25rem;
+}
+
+.mr-4 {
+  margin-right: 1rem;
+}
+
+.mt-5 {
+  margin-top: 1.25rem;
+}
+
 .mt-6 {
   margin-top: 1.5rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
 }
 
 .space-y-2 > * + * {
@@ -204,6 +252,10 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
+.rounded {
+  border-radius: 0.25rem;
+}
+
 .rounded-md {
   border-radius: 0.375rem;
 }
@@ -221,8 +273,28 @@ html, body {
   background-color: white;
 }
 
+.bg-black {
+  background-color: black;
+}
+
 .bg-blue-600 {
   background-color: var(--primary);
+}
+
+.bg-gray-800 {
+  background-color: #1f2937;
+}
+
+.bg-border {
+  background-color: var(--border);
+}
+
+.bg-background {
+  background-color: var(--background);
+}
+
+.bg-opacity-70 {
+  background-opacity: 0.7;
 }
 
 .text-white {
@@ -241,6 +313,14 @@ html, body {
   color: var(--primary);
 }
 
+.text-primary {
+  color: var(--primary);
+}
+
+.text-secondary {
+  color: var(--secondary);
+}
+
 /* Effects */
 .shadow-sm {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -252,6 +332,10 @@ html, body {
 
 .shadow-md {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Transitions */
@@ -298,12 +382,25 @@ html, body {
   animation: bounce 1s infinite;
 }
 
+.animate-pulse > * {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);
   }
   50% {
     transform: translateY(-25%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
   }
 }
 
@@ -403,6 +500,51 @@ a:hover {
   display: none;
 }
 
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.list-disc {
+  list-style-type: disc;
+}
+
+.pl-6 {
+  padding-left: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 768px) {
   .md\:flex {
     display: flex;
@@ -427,6 +569,12 @@ a:hover {
   
   .md\:text-left {
     text-align: left;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -811,18 +959,22 @@ a:hover {
   margin-bottom: 1rem;
 }
 
-.text-primary {
-  color: var(--primary);
+/* Fix for the CTA section buttons in dark mode */
+.dark .cta .secondary-button {
+  background-color: var(--muted);
+  color: white;
 }
 
-.text-secondary {
-  color: var(--secondary);
+.dark .cta .secondary-button:hover {
+  background-color: var(--secondary);
 }
 
-.mr-1 {
-  margin-right: 0.25rem;
+/* Fix for the feature cards in dark mode */
+.dark .feature-card {
+  background-color: var(--muted);
 }
 
-.mr-4 {
-  margin-right: 1rem;
+/* Fix for the category cards in dark mode */
+.dark .category-card {
+  background-color: var(--muted);
 }

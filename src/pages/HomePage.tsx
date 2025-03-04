@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { categories } from '../data/docs'
-import { Rocket, BookOpen, Code, Folder, Edit, Search, Globe, Palette, Users } from 'lucide-react'
+import { Rocket, BookOpen, Code, Folder, Edit, Search, Palette, Users } from 'lucide-react'
 
 // Map category IDs to icons
-const categoryIcons = {
+const categoryIcons: Record<string, JSX.Element> = {
   'getting-started': <Rocket size={24} className="text-primary" />,
   'guides': <BookOpen size={24} className="text-primary" />,
   'api': <Code size={24} className="text-primary" />,
@@ -35,42 +35,42 @@ export function HomePage() {
           <div className="feature-grid">
             <div className="feature-card">
               <div className="feature-icon">
-                <Edit size={32} className="text-primary" />
+                <Edit size={32} className="text-white" />
               </div>
               <h3>Beautiful Docs</h3>
               <p>Create beautiful, responsive documentation that looks great on all devices. Support for rich media and interactive elements.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
-                <BookOpen size={32} className="text-primary" />
+                <BookOpen size={32} className="text-white" />
               </div>
               <h3>Markdown Support</h3>
               <p>Write your documentation in Markdown with support for code highlighting, tables, and other formatting options.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
-                <Code size={32} className="text-primary" />
+                <Code size={32} className="text-white" />
               </div>
               <h3>Versioning</h3>
               <p>Support for multiple versions of your documentation. Keep track of changes and allow users to access previous versions.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
-                <Search size={32} className="text-primary" />
+                <Search size={32} className="text-white" />
               </div>
               <h3>Powerful Search</h3>
               <p>Advanced search functionality with filters and suggestions to help users find exactly what they need quickly.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
-                <Palette size={32} className="text-primary" />
+                <Palette size={32} className="text-white" />
               </div>
               <h3>Customization</h3>
               <p>Customize the look and feel to match your brand. Choose from pre-built themes or create your own custom design.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
-                <Users size={32} className="text-primary" />
+                <Users size={32} className="text-white" />
               </div>
               <h3>Team Collaboration</h3>
               <p>Collaborate with your team to create and manage documentation. Role-based access control and review workflows.</p>
@@ -90,7 +90,7 @@ export function HomePage() {
             {categories.map(category => (
               <Link key={category.id} to={`/docs/category/${category.id}`} className="category-card">
                 <div className="category-icon">
-                  {categoryIcons[category.id as keyof typeof categoryIcons] || category.icon}
+                  {categoryIcons[category.id] || <div>{category.icon}</div>}
                 </div>
                 <div>
                   <h3>{category.title}</h3>
