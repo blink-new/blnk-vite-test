@@ -1,5 +1,5 @@
-import { ReactNode, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { ReactNode, useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 interface LayoutProps {
   children: ReactNode
@@ -8,6 +8,21 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const location = useLocation()
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location])
+
+  // Check system preference for dark mode
+  useEffect(() => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    setIsDarkMode(prefersDark)
+    if (prefersDark) {
+      document.documentElement.classList.add('dark')
+    }
+  }, [])
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode)
@@ -18,24 +33,22 @@ export function Layout({ children }: LayoutProps) {
     <div className={`app ${isDarkMode ? 'dark' : ''}`}>
       <header className="header">
         <div className="container">
-          <div className="header-logo">
-            <Link to="/" className="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-              <h1>DocsCMS</h1>
-            </Link>
-          </div>
+          <Link to="/" className="header-logo">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+            <h1>DocsCMS</h1>
+          </Link>
 
           <button
             className="mobile-menu-button"
@@ -137,10 +150,10 @@ export function Layout({ children }: LayoutProps) {
       {isMobileMenuOpen && (
         <div className="mobile-menu">
           <ul>
-            <li><Link to="/docs" onClick={() => setIsMobileMenuOpen(false)}>Documentation</Link></li>
-            <li><Link to="/guides" onClick={() => setIsMobileMenuOpen(false)}>Guides</Link></li>
-            <li><Link to="/api" onClick={() => setIsMobileMenuOpen(false)}>API</Link></li>
-            <li><Link to="/examples" onClick={() => setIsMobileMenuOpen(false)}>Examples</Link></li>
+            <li><Link to="/docs">Documentation</Link></li>
+            <li><Link to="/guides">Guides</Link></li>
+            <li><Link to="/api">API</Link></li>
+            <li><Link to="/examples">Examples</Link></li>
           </ul>
         </div>
       )}

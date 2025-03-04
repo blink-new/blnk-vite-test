@@ -51,7 +51,7 @@ export function DocsPage() {
                     to={`/docs/category/${category.id}`} 
                     className={categoryId === category.id ? 'active' : ''}
                   >
-                    {category.title}
+                    {category.icon} {category.title}
                   </Link>
                 </li>
               ))}
@@ -61,13 +61,13 @@ export function DocsPage() {
           <div className="docs-content">
             <h1>{selectedCategory ? selectedCategory.title : 'Documentation'}</h1>
             {selectedCategory && (
-              <p className="mb-6">{selectedCategory.description}</p>
+              <p className="mb-6 text-muted-foreground">{selectedCategory.description}</p>
             )}
             
             {filteredDocs.length === 0 ? (
-              <div className="p-6 border rounded-lg text-center">
+              <div className="p-4 border rounded-lg text-center bg-secondary">
                 <h3 className="text-lg font-medium mb-2">No documents found</h3>
-                <p>
+                <p className="text-muted-foreground">
                   {searchQuery 
                     ? `No results for "${searchQuery}". Try a different search term.` 
                     : 'No documents available in this category yet.'}
@@ -83,6 +83,23 @@ export function DocsPage() {
                   >
                     <h2 className="text-xl font-semibold mb-2">{doc.title}</h2>
                     <p className="text-sm text-muted-foreground">{doc.description}</p>
+                    <div className="mt-4 flex items-center text-sm text-primary">
+                      Read more
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className="ml-1"
+                      >
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </div>
                   </Link>
                 ))}
               </div>
