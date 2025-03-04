@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { getDocBySlug, getDocsByCategory } from '../data/docs'
 import { DocItem } from '../data/docs'
+import { ArrowLeft, Clock, Calendar } from 'lucide-react'
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -31,9 +32,11 @@ export function DocPage() {
       <Layout>
         <div className="container py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-pulse">
-              <div className="h-8 w-64 bg-muted rounded mb-4"></div>
-              <div className="h-4 w-96 bg-muted rounded"></div>
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 w-64 bg-border rounded"></div>
+              <div className="h-4 w-96 bg-border rounded"></div>
+              <div className="h-4 w-80 bg-border rounded"></div>
+              <div className="h-4 w-72 bg-border rounded"></div>
             </div>
           </div>
         </div>
@@ -70,28 +73,35 @@ export function DocPage() {
           </div>
           
           <div className="docs-content">
-            <div className="mb-4">
-              <Link to="/docs" className="text-sm text-primary hover:underline flex items-center">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                  className="mr-1"
-                >
-                  <line x1="19" y1="12" x2="5" y2="12"></line>
-                  <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
+            <div className="mb-6">
+              <Link to="/docs" className="inline-flex items-center text-sm text-primary hover:underline mb-4">
+                <ArrowLeft size={16} className="mr-1" />
                 Back to Documentation
               </Link>
+              
+              <h1>{doc.title}</h1>
+              
+              <div className="flex items-center text-sm text-text-secondary mb-6">
+                <div className="flex items-center mr-4">
+                  <Calendar size={14} className="mr-1" />
+                  <span>
+                    {new Date(doc.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <Clock size={14} className="mr-1" />
+                  <span>
+                    {Math.ceil(doc.content.split(' ').length / 200)} min read
+                  </span>
+                </div>
+              </div>
             </div>
             
-            <div dangerouslySetInnerHTML={{ __html: markdownToHtml(doc.content) }} />
+            <div className="prose prose-lg dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(doc.content) }} />
           </div>
         </div>
       </div>
@@ -105,25 +115,27 @@ function markdownToHtml(markdown: string): string {
   // In a real app, you would use a proper markdown parser
   let html = markdown
     // Headers
-    .replace(/^# (.*$)/gm, '<h1 id="$1">$1</h1>')
-    .replace(/^## (.*$)/gm, '<h2 id="$1">$1</h2>')
-    .replace(/^### (.*$)/gm, '<h3 id="$1">$1</h3>')
+    .replace(/^# (.*$)/gm, '<h1 id="$1" class="text-3xl font-bold mt-8 mb-4">$1</h1>')
+    .replace(/^## (.*$)/gm, '<h2 id="$1" class="text-2xl font-bold mt-6 mb-3">$1</h2>')
+    .replace(/^### (.*$)/gm, '<h3 id="$1" class="text-xl font-bold mt-5 mb-2">$1</h3>')
     // Bold
     .replace(/\*\*(.*)\*\*/gm, '<strong>$1</strong>')
     // Italic
     .replace(/\*(.*)\*/gm, '<em>$1</em>')
     // Code blocks
-    .replace(/```([\s\S]*?)```/gm, '<pre><code>$1</code></pre>')
+    .replace(/```([^`]+)```/gm, '<pre class="bg-background p-4 rounded-md overflow-x-auto my-4"><code>$1</code></pre>')
     // Inline code
-    .replace(/`([^`]+)`/gm, '<code>$1</code>')
+    .replace(/`([^`]+)`/gm, '<code class="bg-background px-1 py-0.5 rounded text-primary">$1</code>')
     // Lists
-    .replace(/^\- (.*$)/gm, '<ul><li>$1</li></ul>')
+    .replace(/^- (.*$)/gm, '<ul class="list-disc pl-6 mb-4"><li>$1</li></ul>')
     // Fix lists (this is a hack)
-    .replace(/<\/ul>\n<ul>/gm, '')
+    .replace(/<\/ul>\n<ul class="list-disc pl-6 mb-4">/gm, '')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/gm, '<a href="$2" class="text-primary hover:underline">$1</a>')
     // Paragraphs
-    .replace(/^(?!<[a-z])(.*$)/gm, '<p>$1</p>')
+    .replace(/^(?!<[a-z])(.*$)/gm, '<p class="mb-4">$1</p>')
     // Fix empty paragraphs
-    .replace(/<p><\/p>/gm, '')
+    .replace(/<p class="mb-4"><\/p>/gm, '')
 
   return html
 }

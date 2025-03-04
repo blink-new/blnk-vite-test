@@ -2,6 +2,15 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { categories, getDocsByCategory, getAllDocs } from '../data/docs'
+import { Search, BookOpen, Code, Folder, Rocket } from 'lucide-react'
+
+// Map category IDs to icons
+const categoryIcons = {
+  'getting-started': <Rocket size={18} />,
+  'guides': <BookOpen size={18} />,
+  'api': <Code size={18} />,
+  'examples': <Folder size={18} />
+}
 
 export function DocsPage() {
   const { categoryId } = useParams<{ categoryId: string }>()
@@ -26,11 +35,14 @@ export function DocsPage() {
       <div className="container py-8">
         <div className="docs-container">
           <div className="docs-sidebar">
-            <div className="mb-4">
+            <div className="mb-4 relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search size={16} className="text-gray-400" />
+              </div>
               <input
                 type="search"
                 placeholder="Search documentation..."
-                className="form-input"
+                className="form-input pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -51,7 +63,8 @@ export function DocsPage() {
                     to={`/docs/category/${category.id}`} 
                     className={categoryId === category.id ? 'active' : ''}
                   >
-                    {category.icon} {category.title}
+                    {categoryIcons[category.id as keyof typeof categoryIcons] || category.icon} 
+                    <span>{category.title}</span>
                   </Link>
                 </li>
               ))}
@@ -65,7 +78,7 @@ export function DocsPage() {
             )}
             
             {filteredDocs.length === 0 ? (
-              <div className="p-4 border rounded-lg text-center bg-secondary">
+              <div className="p-6 border rounded-lg text-center bg-background">
                 <h3 className="text-lg font-medium mb-2">No documents found</h3>
                 <p className="text-muted-foreground">
                   {searchQuery 
@@ -79,11 +92,11 @@ export function DocsPage() {
                   <Link 
                     key={doc.id} 
                     to={`/docs/${doc.slug}`} 
-                    className="p-4 border rounded-lg hover:bg-secondary transition-colors"
+                    className="p-5 border border-border rounded-lg hover:bg-background transition-colors group"
                   >
-                    <h2 className="text-xl font-semibold mb-2">{doc.title}</h2>
-                    <p className="text-sm text-muted-foreground">{doc.description}</p>
-                    <div className="mt-4 flex items-center text-sm text-primary">
+                    <h2 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">{doc.title}</h2>
+                    <p className="text-sm text-text-secondary mb-4">{doc.description}</p>
+                    <div className="flex items-center text-sm text-primary font-medium">
                       Read more
                       <svg 
                         xmlns="http://www.w3.org/2000/svg" 
@@ -95,7 +108,7 @@ export function DocsPage() {
                         strokeWidth="2" 
                         strokeLinecap="round" 
                         strokeLinejoin="round"
-                        className="ml-1"
+                        className="ml-1 transition-transform group-hover:translate-x-1"
                       >
                         <polyline points="9 18 15 12 9 6"></polyline>
                       </svg>
