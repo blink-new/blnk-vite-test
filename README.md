@@ -1,50 +1,157 @@
-# React + TypeScript + Vite
+# DocsCMS - Modern Documentation Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![DocsCMS](https://i.imgur.com/XYZ123.png)
 
-Currently, two official plugins are available:
+DocsCMS is a modern documentation platform built with React and TypeScript. It provides a clean, responsive interface for creating, managing, and browsing documentation.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **Beautiful Documentation**: Create and present documentation with a clean, modern interface
+- **Dark Mode Support**: Built-in dark mode for comfortable reading in any environment
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **Markdown Support**: Write documentation in Markdown with support for code highlighting
+- **Categorized Content**: Organize documentation into categories for easy navigation
+- **Search Functionality**: Quickly find documentation with built-in search
+- **Interactive 3D Elements**: Includes a 3D solar system visualization component
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Tech Stack
 
-- Configure the top-level `parserOptions` property like this:
+- **React**: UI library for building the user interface
+- **TypeScript**: Type-safe JavaScript for better development experience
+- **React Router**: For handling navigation and routing
+- **Three.js/React Three Fiber**: For 3D visualizations
+- **CSS Variables**: For theming and dark mode support
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+### Prerequisites
+
+- Node.js 14.0 or higher
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/docscms.git
+cd docscms
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+2. Install dependencies:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm install
 ```
+
+3. Start the development server:
+
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:3000`
+
+## Project Structure
+
+```
+docscms/
+├── public/              # Static assets
+│   └── textures/        # Texture files for 3D components
+├── src/                 # Source code
+│   ├── components/      # React components
+│   ├── data/            # Data files and mock APIs
+│   ├── lib/             # Utility functions
+│   ├── pages/           # Page components
+│   │   └── cms/         # CMS-related pages
+│   └── types/           # TypeScript type definitions
+├── .gitignore           # Git ignore file
+├── package.json         # Project dependencies
+├── README.md            # Project documentation
+├── tsconfig.json        # TypeScript configuration
+└── vite.config.ts       # Vite configuration
+```
+
+## Usage
+
+### Browsing Documentation
+
+The platform provides several ways to browse documentation:
+
+- **Homepage**: Overview of the platform with featured documentation
+- **Documentation Page**: Browse all documentation or filter by category
+- **Search**: Use the search bar to find specific documentation
+
+### Creating Documentation
+
+To create new documentation:
+
+1. Log in to the CMS
+2. Navigate to the document editor
+3. Write your documentation in Markdown
+4. Assign a category and add metadata
+5. Publish your documentation
+
+## Customization
+
+### Theming
+
+The platform uses CSS variables for theming. You can customize the colors by editing the CSS variables in `src/App.css`:
+
+```css
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary: #818cf8;
+  /* ... other variables */
+}
+
+.dark {
+  --primary: #818cf8;
+  --primary-hover: #6366f1;
+  --secondary: #4f46e5;
+  /* ... other variables */
+}
+```
+
+### Adding Categories
+
+To add new documentation categories, edit the `categories` array in `src/data/docs.ts`:
+
+```typescript
+export const categories: DocCategory[] = [
+  {
+    id: 'new-category',
+    title: 'New Category',
+    description: 'Description of the new category',
+    icon: '🆕'
+  },
+  // ... other categories
+];
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [React Three Fiber](https://github.com/pmndrs/react-three-fiber)
+- [React Router](https://reactrouter.com/)
+
+---
+
+Built with ❤️ by DocsCMS Team
